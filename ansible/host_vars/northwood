@@ -1,0 +1,10 @@
+repo_url: https://github.com/smudent
+repo: 3428
+home_dir: /home/ubuntu
+repo_dir: "{{ home_dir }}/{{ repo }}"
+django_dir: "{{ repo_dir }}/"
+static_dir: "{{ home_dir }}/static"
+django_project: northwood
+dbname: northwood
+dbuser: northwood
+dbpassword: "{{ lookup('password', 'mysqlpasswd') }}"

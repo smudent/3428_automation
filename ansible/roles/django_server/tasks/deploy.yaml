@@ -1,0 +1,36 @@
+- name: pull branch master
+  git:
+    repo: '{{ repo_url }}/{{ repo }}.git'
+    dest: '{{ repo_dir }}'
+    accept_hostkey: yes
+
+- name: install python requirements
+  pip: 
+    requirements: '{{ repo_dir }}/requirements/production.txt'
+    extra_args: --upgrade
+
+- name: create static_root dir
+  file: 
+    path: '{{ static_dir }}' 
+    state: directory 
+    mode: 0755
+
+- name: django collectstatic
+  shell: ./manage.py collectstatic --noinput
+  args:
+    chdir: '{{ django_dir }}'
+
+- name: django migrate
+  shell: ./manage.py migrate --noinput
+  args: 
+    chdir: '{{ django_dir }}'
+
+- name: django loaddata
+  shell: ./manage.py loaddata user 
+  args:
+    chdir: '{{ django_dir }}'
+
+- name: uwsgi restart
+  service: 
+    name: uwsgi 
+    state: restarted

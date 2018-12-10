@@ -1,0 +1,50 @@
+{
+    "variables":
+    {
+        "gcloud_account_file": "",
+        "gcloud_project_id": "",
+        "ansible_dir": "../ansible",
+        "ansible_playbook": "northwood.yml",
+        "ssh_username": "ubuntu",
+        "vm_name": "packer-build-1",
+        "gc_zone": "us-central1-a"
+    },
+    "builders": [
+        {
+            "type": "googlecompute",
+            "account_file": "{{user `gcloud_account_file`}}",
+            "project_id": "{{user `gcloud_project_id`}}",
+            "source_image_family": "ubuntu",
+            "ssh_username": "{{user `ssh_username`}}",
+            "zone": "{{user `gc_zone`}}",
+            "source_image_family": "ubuntu-1804-lts",
+            "machine_type": "g1-small",
+            "instance_name": "{{user `vm_name`}}"
+        }
+    ],
+    "provisioners": [
+        { 
+            "type": "shell-local",
+            "script": "./get_host_ip.sh",
+            "environment_vars": [
+                "INSTANCE_NAME={{user `vm_name`}}",
+                "GC_ZONE={{user `gc_zone`}}"
+            ]
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "sudo apt install -y python3"
+            ]
+        },
+        {
+            "type": "ansible",
+            "playbook_file": "{{user `ansible_dir`}}/{{user `ansible_playbook`}}",
+            "host_alias": "northwood",
+            "extra_arguments": [
+                "-vv",
+                "--extra-vars", "ansible_python_interpreter=/usr/bin/python3"
+            ]
+        }
+    ]
+}

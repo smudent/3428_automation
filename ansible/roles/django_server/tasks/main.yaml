@@ -1,0 +1,5 @@
+- import_tasks: system.yaml
+- import_tasks: packages.yaml
+- import_tasks: config_files.yaml
+- import_tasks: deploy.yaml
+- import_tasks: upgrade.yaml

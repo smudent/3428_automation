@@ -1,0 +1,12 @@
+- hosts: northwood
+  become: true
+  vars_files:
+      - host_vars/northwood
+      - '/tmp/packer/{{ packer_builder_type }}.yml'
+  environment:
+      DJANGO_SETTINGS_MODULE: '{{ django_project }}.settings.production'
+      DATABASE_URL: 'mysql://{{ dbuser }}:{{ dbpassword }}@localhost/{{ dbname }}'
+      STATIC_ROOT: '{{ static_dir }}'
+  roles:
+      - ansible-role-mysql-master
+      - django_server
