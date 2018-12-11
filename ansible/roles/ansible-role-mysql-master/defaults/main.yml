@@ -116,9 +116,9 @@ mysql_databases:
 mysql_users: 
    - {
        name: '{{ dbuser }}',
-       host: 127.0.0.1,
+       host: localhost,
        password: '{{ dbpassword }}',
-       priv: '*.*:USAGE'
+       priv: '*.*:ALL'
      }
 
 # Replication settings (replication is only enabled if master/user have values).

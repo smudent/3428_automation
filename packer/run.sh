@@ -10,6 +10,5 @@ done
 
 packer build \
     -var-file=$SECRETS_FILE \
-    -debug \
     $3
 

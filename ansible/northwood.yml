@@ -5,7 +5,7 @@
       - '/tmp/packer/{{ packer_builder_type }}.yml'
   environment:
       DJANGO_SETTINGS_MODULE: '{{ django_project }}.settings.production'
-      DATABASE_URL: 'mysql://{{ dbuser }}:{{ dbpassword }}@localhost/{{ dbname }}'
+      DATABASE_URL: '{{ database_url }}'
       STATIC_ROOT: '{{ static_dir }}'
   roles:
       - ansible-role-mysql-master

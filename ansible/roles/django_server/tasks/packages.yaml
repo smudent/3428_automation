@@ -20,6 +20,7 @@
       - fail2ban
       - python3-dev
       - python3-pip
+      - virtualenv
       - default-libmysqlclient-dev
       - git
       - rdiff-backup

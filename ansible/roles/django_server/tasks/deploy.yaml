@@ -4,9 +4,14 @@
     dest: '{{ repo_dir }}'
     accept_hostkey: yes
 
+- name: install virtualenv
+  shell: 'virtualenv --python=python3 {{ home_dir }}/venv'
+
 - name: install python requirements
   pip: 
     requirements: '{{ repo_dir }}/requirements/production.txt'
+    virtualenv: '{{ home_dir }}/venv'
+    virtualenv_python: python3
     extra_args: --upgrade
 
 - name: create static_root dir
@@ -15,20 +20,41 @@
     state: directory 
     mode: 0755
 
+- name: create run dir
+  file:
+      path: '{{ django_dir }}/run'
+      state: directory
+      mode: 0755
+
+- name: touch SECRET.key file
+  file:
+      path: '{{ django_dir }}/run/SECRET.key'
+      state: touch
+      mode: '755'
+
+- name: chmod +w SECRET.key
+  shell: 'chmod +w {{ django_dir }}/run/SECRET.key'
+
+- name: add database URL to settings file
+  lineinfile:
+      path: '{{ django_dir }}/northwood/settings/production.py'
+      line: 'DATABASES["default"] = dj_database_url.config(default="{{ database_url }}")'
+      state: present
+      
 - name: django collectstatic
-  shell: ./manage.py collectstatic --noinput
+  shell: 'source {{ home_dir }}/venv/bin/activate && {{ django_dir }}/manage.py collectstatic --no-input'
   args:
-    chdir: '{{ django_dir }}'
+    executable: /bin/bash
 
 - name: django migrate
-  shell: ./manage.py migrate --noinput
-  args: 
-    chdir: '{{ django_dir }}'
-
-- name: django loaddata
-  shell: ./manage.py loaddata user 
+  shell: 'source {{ home_dir }}/venv/bin/activate && {{ django_dir }}/manage.py migrate --no-input'
   args:
-    chdir: '{{ django_dir }}'
+    executable: /bin/bash
+
+    #- name: django loaddata
+    #  shell: 'source {{ home_dir }}/venv/bin/activate && {[ django_dir }}/manage.py loaddata user'
+    #  args:
+    #    executable: /bin/bash
 
 - name: uwsgi restart
   service: 
